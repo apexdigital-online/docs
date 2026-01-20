@@ -1,0 +1,284 @@
+---
+title: Contacts module
+description: Manage and organize contacts in Compass with custom fields, notes, and project relationships
+---
+
+## Overview
+
+The Contacts module in Compass allows you to manage individuals and their relationships with stakeholders, projects, and other entities. You can store detailed contact information, track interactions through notes, and maintain custom fields for additional data.
+
+## Key features
+
+### Contact management
+
+Create and manage contacts with comprehensive information including:
+
+- **Personal information**: First name, last name, date of birth
+- **Professional details**: Company, position, email, phone
+- **Location**: City and timezone
+- **Social**: LinkedIn profile URL
+- **Photo**: Profile photo upload
+- **Notes**: Internal notes about the contact
+
+### Custom fields
+
+Define and manage custom fields specific to your workspace needs. Custom fields support various data types and can be organized into sections for better organization.
+
+### Project relationships
+
+Link contacts to projects with specific roles. Each contact can be associated with multiple projects, and you can track:
+
+- Project role (e.g., Client, Consultant, Stakeholder)
+- Project details
+- Relationship metadata
+
+### Stakeholder integration
+
+Connect contacts to stakeholders in your system. This allows you to:
+
+- Link individual contacts to organizational stakeholders
+- Track relationships between people and companies
+- Maintain hierarchical contact structures
+
+### Notes and mentions
+
+Add notes to contacts with support for:
+
+- Rich text notes
+- User mentions with `@` notation
+- Automatic email notifications for mentioned users
+- Note history and tracking
+
+### Bulk operations
+
+Perform operations on multiple contacts simultaneously:
+
+- **Bulk create**: Import multiple contacts at once
+- **Bulk update**: Update fields across multiple contacts
+- **Bulk delete**: Remove multiple contacts
+- **Import/Export**: Excel-based import and export functionality
+
+### Search and filtering
+
+Find contacts quickly using:
+
+- **Search**: Search by first name, last name, email, or company
+- **Filters**: Advanced filtering by custom fields and attributes
+- **Custom views**: Save and share filtered views
+- **Sorting**: Sort by any column
+
+## Data structure
+
+### Contact entity
+
+```typescript
+{
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth?: Date;
+  photoFileId?: string;
+  company?: string;
+  relatedStakeholderId?: string;
+  position?: string;
+  email?: string;
+  phone?: string;
+  cityId?: string;
+  timezone?: string;
+  linkedinUrl?: string;
+  notes?: string;
+  customFields: CustomField[];
+  relatedProjects: ProjectContact[];
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+}
+```
+
+### Contact note
+
+```typescript
+{
+  id: string;
+  contactId: string;
+  note: string;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+}
+```
+
+## API operations
+
+### Create contact
+
+Create a new contact with all associated data.
+
+**Endpoint**: `POST /api/contacts`
+
+**Required fields**:
+- `firstName` (1-100 characters)
+- `lastName` (1-100 characters)
+
+**Optional fields**:
+- `dateOfBirth`
+- `photoFile.id`
+- `company` (max 255 characters)
+- `relatedStakeholder.id`
+- `city.id`
+- `position` (max 255 characters)
+- `email` (valid email format)
+- `phone` (max 50 characters)
+- `timezone` (3-50 characters)
+- `linkedinUrl` (max 255 characters)
+- `notes` (max 1000 characters)
+- `customFields[]`
+
+### List contacts
+
+Retrieve contacts with pagination, filtering, and sorting.
+
+**Endpoint**: `GET /api/contacts`
+
+**Query parameters**:
+- `page`: Page number
+- `size`: Items per page
+- `search`: Search keyword
+- `relatedStakeholderIds[]`: Filter by stakeholder
+- `filter`: Advanced filter conditions
+
+### Get contact
+
+Retrieve a single contact by ID with all related data.
+
+**Endpoint**: `GET /api/contacts/:id`
+
+### Update contact
+
+Update contact information partially or completely.
+
+**Endpoint**: `PATCH /api/contacts/:id`
+
+### Delete contact
+
+Soft delete a contact (can be restored).
+
+**Endpoint**: `DELETE /api/contacts/:id`
+
+### Bulk operations
+
+**Bulk create**: `POST /api/contacts/bulk`
+
+**Bulk update**: `PATCH /api/contacts/bulk`
+
+**Bulk delete**: `DELETE /api/contacts/bulk`
+
+**Import**: `POST /api/contacts/import`
+
+## Custom fields
+
+### Module settings
+
+Configure custom fields at the workspace level through contact module settings. Custom fields can be:
+
+- Text input
+- Number input
+- Date picker
+- Dropdown select
+- Checkbox
+- File upload
+- Reference to other entities
+
+### Field management
+
+Custom fields are organized into sections and can be:
+
+- Reordered by display order
+- Made required or optional
+- Configured with validation rules
+- Shown or hidden based on conditions
+
+## Notes and collaboration
+
+### Creating notes
+
+Add notes to contacts to track interactions, conversations, or important information.
+
+```typescript
+{
+  contactId: string;
+  note: string;
+  mentionedUsers: string[];
+}
+```
+
+### Mentions
+
+Use `@username` syntax in notes to mention users. Mentioned users receive email notifications automatically.
+
+## Permissions
+
+The Contacts module respects workspace-level permissions:
+
+- **View**: See contact list and details
+- **Create**: Add new contacts
+- **Update**: Edit contact information
+- **Delete**: Remove contacts
+- **Manage custom fields**: Configure module settings
+
+Permissions are role-based and can be configured through the Users & Roles module.
+
+## Integration points
+
+### Projects
+
+Contacts can be linked to projects with specific roles, enabling:
+
+- Project team management
+- Stakeholder tracking
+- Communication management
+
+### Stakeholders
+
+Connect individual contacts to organizational stakeholders for:
+
+- Company hierarchy
+- Vendor relationships
+- Client organization structures
+
+### Files
+
+Upload and attach files to contacts:
+
+- Profile photos
+- Documents
+- Custom field attachments
+
+## Best practices
+
+1. **Use consistent naming**: Maintain consistent first name and last name formats
+2. **Link to stakeholders**: Connect individual contacts to their organizations
+3. **Leverage custom fields**: Use custom fields for industry-specific data
+4. **Add notes regularly**: Document interactions and important information
+5. **Maintain project relationships**: Keep project-contact relationships up to date
+6. **Use bulk operations**: Import contacts in bulk when onboarding
+7. **Export regularly**: Export contact data for backup and reporting
+
+## Validation rules
+
+- First name and last name are required (1-100 characters each)
+- Email must be unique and valid format
+- Phone numbers max 50 characters
+- Company name max 255 characters
+- Position max 255 characters
+- LinkedIn URL max 255 characters
+- Notes max 1000 characters
+- Timezone must be 3-50 characters
+
+## Related modules
+
+- **Stakeholders**: Organizational entities that contacts belong to
+- **Projects**: Projects that contacts are involved in
+- **Users & Roles**: Permission management for contact access
+- **Custom Fields**: Extensible data structure configuration
